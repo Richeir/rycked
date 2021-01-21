@@ -2,17 +2,19 @@ package rycked
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"log"
 	"time"
+
+	"github.com/google/uuid"
 )
 
+// Tracer 1
 type Tracer struct {
 	DocumentID string
-	Id       string
-	Name     string
-	StartAt  int64
-	FinishAt int64
+	ID         string
+	Name       string
+	StartAt    int64
+	FinishAt   int64
 }
 
 // SpanReferenceType is an enum type describing different categories of
@@ -25,14 +27,14 @@ type Tracer struct {
 // or Span-2 may be sitting in a distributed queue behind Span-1.
 type SpanReferenceType int
 
-//创建新的 Tracer
+// NewTracer 创建新的 Tracer
 func NewTracer(serviceName string) *Tracer {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		log.Fatal("error create UUID")
 	}
 	tracer := &Tracer{
-		Id:      uuid.String(),
+		ID:      uuid.String(),
 		Name:    serviceName,
 		StartAt: time.Now().UnixNano() / 1e6,
 	}
@@ -42,12 +44,12 @@ func NewTracer(serviceName string) *Tracer {
 	return tracer
 }
 
-//创建 Span
+// NewSpan 创建 Span
 func NewSpan(tracer *Tracer, operationName string) *Span {
 	uuid, _ := uuid.NewUUID()
 	span := &Span{
-		Id:            uuid.String(),
-		TraceId:       tracer.Id,
+		ID:            uuid.String(),
+		TraceID:       tracer.ID,
 		OperationName: operationName,
 		Depth:         1,
 		StartAt:       time.Now().UnixNano() / 1e6,
@@ -60,8 +62,8 @@ func NewSpan(tracer *Tracer, operationName string) *Span {
 	return span
 }
 
-//开启新的 span
-//如果传入的是 tracerid 可以找到对应的 tracer，那么返回，否则创建新的
+// StartSpan 开启新的 span
+// 如果传入的是 tracerid 可以找到对应的 tracer，那么返回，否则创建新的
 func (t *Tracer) StartSpan(operationName string, tracerid string) *Span {
 	var tracer *Tracer
 

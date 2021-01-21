@@ -2,15 +2,18 @@ package rycked
 
 import (
 	"context"
-	"github.com/elastic/go-elasticsearch"
-	"github.com/elastic/go-elasticsearch/esapi"
 	"log"
 	"strings"
+
+	"github.com/elastic/go-elasticsearch"
+	"github.com/elastic/go-elasticsearch/esapi"
 )
 
+// EsBridge 1
 type EsBridge struct {
 }
 
+// GetClient 1
 func GetClient() *elasticsearch.Client {
 	//TODO:到时候改成读 yaml 文件中的配置
 	cfg := elasticsearch.Config{
@@ -26,12 +29,13 @@ func GetClient() *elasticsearch.Client {
 	return es
 }
 
-func WriteEs(jsonString string, docId string) {
+// WriteEs 1
+func WriteEs(jsonString string, docID string) {
 	esClient := GetClient()
 
 	req := esapi.IndexRequest{
 		Index:      "my-index",
-		DocumentID: docId,
+		DocumentID: docID,
 		Body:       strings.NewReader(jsonString),
 	}
 	req.Do(context.Background(), esClient)

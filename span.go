@@ -5,27 +5,28 @@ import (
 	"time"
 )
 
-//
+// SpanContext 1
 type SpanContext interface {
 }
 
-//一个有开始和结束的最小调用的过程
+// Span 一个有开始和结束的最小调用的过程
 type Span struct {
-	DocumentID string
-	Id            string
-	TraceId       string
+	DocumentID    string
+	ID            string
+	TraceID       string
 	OperationName string
 	Depth         int
 	StartAt       int64
 	FinishAt      int64
 }
 
+// SpanReference 1
 type SpanReference struct {
 	Type              SpanReferenceType
 	ReferencedContext SpanContext
 }
 
-//Span 的完成方法，标记好结束时间，更新至ES
+// Finish : Span 的完成方法，标记好结束时间，更新至ES
 func (span *Span) Finish(targetSpan *Span) {
 	targetSpan.FinishAt = time.Now().UnixNano() / 1e6
 	//TODO: 更新至ES
