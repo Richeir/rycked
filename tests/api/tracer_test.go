@@ -6,6 +6,6 @@ import (
 )
 
 func TestTracer(t *testing.T) {
-	var tracer rycked.Tracer
-	tracer.StartSpan("n1","")
+	var tracer apm.Tracer
+	tracer.StartSpan("testTracer1", "")
 }

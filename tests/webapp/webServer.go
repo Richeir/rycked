@@ -27,7 +27,7 @@ func main() {
 	//注册路由
 	mux.HandleFunc("/", indexHandler)
 	finalHandler := http.HandlerFunc(final)
-	mux.Handle("/query",  rycked.ApmMiddleware((finalHandler)))
+	mux.Handle("/query", apm.ApmMiddleware((finalHandler)))
 
 	//启动本地服务器
 	addr := fmt.Sprintf("127.0.0.1:%d", port)

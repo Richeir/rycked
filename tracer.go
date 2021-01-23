@@ -1,8 +1,8 @@
-package rycked
+package apm
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/elastic/go-elasticsearch/esapi"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,8 +13,8 @@ type Tracer struct {
 	DocumentID string
 	ID         string
 	Name       string
-	StartAt    int64
-	FinishAt   int64
+	StartAt    time.Time
+	FinishAt   time.Time
 }
 
 // SpanReferenceType is an enum type describing different categories of
@@ -29,18 +29,15 @@ type SpanReferenceType int
 
 // NewTracer 创建新的 Tracer
 func NewTracer(serviceName string) *Tracer {
-	uuid, err := uuid.NewUUID()
-	if err != nil {
-		log.Fatal("error create UUID")
-	}
+	uuid, _ := uuid.NewUUID()
 	tracer := &Tracer{
 		ID:      uuid.String(),
 		Name:    serviceName,
-		StartAt: time.Now().UnixNano() / 1e6,
+		StartAt: time.Now(),
 	}
 
 	b, _ := json.Marshal(tracer)
-	WriteEs(string(b), "")
+	WriteEs(TracerIndexName, string(b), "")
 	return tracer
 }
 
@@ -52,14 +49,18 @@ func NewSpan(tracer *Tracer, operationName string) *Span {
 		TraceID:       tracer.ID,
 		OperationName: operationName,
 		Depth:         1,
-		StartAt:       time.Now().UnixNano() / 1e6,
+		StartAt:       time.Now(),
 	}
 
 	//TODO:写入ES
 	b, _ := json.Marshal(span)
-	WriteEs(string(b), "")
+	WriteEs(SpanIndexName, string(b), "")
 
 	return span
+}
+
+func GetTracer(tracerid string) *esapi.Response {
+	return QueryTracer(tracerid)
 }
 
 // StartSpan 开启新的 span
@@ -68,7 +69,7 @@ func (t *Tracer) StartSpan(operationName string, tracerid string) *Span {
 	var tracer *Tracer
 
 	if tracerid == "" {
-		tracerNew := NewTracer("Service1")
+		tracerNew := NewTracer(operationName)
 		tracer = tracerNew
 	} else {
 		//读取 Tracer
@@ -77,3 +78,8 @@ func (t *Tracer) StartSpan(operationName string, tracerid string) *Span {
 	newSpan := NewSpan(tracer, operationName)
 	return newSpan
 }
+
+//
+//func (t *Tracer) GetTracer(tracerid string) *Tracer{
+//
+//}
