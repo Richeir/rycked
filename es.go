@@ -18,8 +18,8 @@ const SpanIndexName = "rycked.span"
 type EsBridge struct {
 }
 
-// GetClient 1
-func GetClient() *elasticsearch.Client {
+// getClient 1
+func getClient() *elasticsearch.Client {
 	//TODO:到时候改成读 yaml 文件中的配置
 	cfg := elasticsearch.Config{
 		Addresses: []string{
