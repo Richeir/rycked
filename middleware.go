@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-// ApmMiddleware 中间件
-func ApmMiddleware(next http.Handler) http.Handler {
+// AddAPMMiddleware 中间件
+func AddAPMMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//HTTP处理之前发生的事情
 		log.Println("Executing middleware before")

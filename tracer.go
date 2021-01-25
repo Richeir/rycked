@@ -2,8 +2,9 @@ package apm
 
 import (
 	"encoding/json"
-	"github.com/elastic/go-elasticsearch/esapi"
 	"time"
+
+	"github.com/elastic/go-elasticsearch/esapi"
 
 	"github.com/google/uuid"
 )
@@ -59,6 +60,7 @@ func NewSpan(tracer *Tracer, operationName string) *Span {
 	return span
 }
 
+// GetTracer 1
 func GetTracer(tracerid string) *esapi.Response {
 	return QueryTracer(tracerid)
 }

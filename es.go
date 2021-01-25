@@ -11,7 +11,10 @@ import (
 	"github.com/elastic/go-elasticsearch/esapi"
 )
 
+// TracerIndexName 1
 const TracerIndexName = "rycked.tracer"
+
+// SpanIndexName 1
 const SpanIndexName = "rycked.span"
 
 // EsBridge 1
@@ -46,6 +49,7 @@ func WriteEs(indexName, jsonString, docID string) {
 	req.Do(context.Background(), esClient)
 }
 
+// QueryTracer 1
 func QueryTracer(tracerid string) *esapi.Response {
 	es := getClient()
 

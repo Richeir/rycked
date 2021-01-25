@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/Richeir/rycked"
 	"log"
 	"net/http"
+
+	apm "github.com/Richeir/rycked"
 )
 
 //最终的页面
@@ -27,7 +28,7 @@ func main() {
 	//注册路由
 	mux.HandleFunc("/", indexHandler)
 	finalHandler := http.HandlerFunc(final)
-	mux.Handle("/query", apm.ApmMiddleware((finalHandler)))
+	mux.Handle("/query", apm.AddAPMMiddleware((finalHandler)))
 
 	//启动本地服务器
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
