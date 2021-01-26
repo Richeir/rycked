@@ -6,6 +6,4 @@ import (
 
 func TestGetTracer(t *testing.T) {
 
-	//var tracer apm.Tracer
-	//tracer.
 }

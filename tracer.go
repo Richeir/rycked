@@ -2,6 +2,7 @@ package rycked
 
 import (
 	"encoding/json"
+	"github.com/Richeir/rycked/es"
 	"log"
 	"time"
 
@@ -31,13 +32,14 @@ type SpanReferenceType int
 func NewTracer(serviceName string) *Tracer {
 	uuid, _ := uuid.NewUUID()
 	tracer := &Tracer{
-		ID:      uuid.String(),
-		Name:    serviceName,
-		StartAt: time.Now(),
+		ID:         uuid.String(),
+		Name:       serviceName,
+		StartAt:    time.Now().UTC(),
+		DocumentID: uuid.String(),
 	}
 
 	b, _ := json.Marshal(tracer)
-	WriteEs(TracerIndexName, string(b), "")
+	es.WriteEs(es.TracerIndexName, string(b), uuid.String())
 	return tracer
 }
 
@@ -49,24 +51,25 @@ func NewSpan(tracer *Tracer, operationName string) *Span {
 		TraceID:       tracer.ID,
 		OperationName: operationName,
 		Depth:         1,
-		StartAt:       time.Now(),
+		StartAt:       time.Now().UTC(),
+		DocumentID:    uuid.String(),
 	}
 
 	//TODO:写入ES
 	b, _ := json.Marshal(span)
-	WriteEs(SpanIndexName, string(b), "")
+	es.WriteEs(es.SpanIndexName, string(b), uuid.String())
 
 	return span
 }
 
-// GetTracer 1
+// GetTracer 直接返回Tracer对象
 func GetTracer(tracerid string) *Tracer {
 	var (
 		r map[string]interface{}
 	)
 
-	var res = QueryTracer(tracerid)
-	var tracer *Tracer
+	var res = es.QueryTracer(tracerid)
+	tracer := &Tracer{}
 
 	if res.IsError() {
 		var e map[string]interface{}
@@ -95,24 +98,19 @@ func GetTracer(tracerid string) *Tracer {
 
 		log.Print("hits content:")
 		hitContent := r["hits"].(map[string]interface{})["hits"].([]interface{})
-		log.Print(hitContent)
-		log.Print(hitContent[0])
-		log.Print(hitContent[0].(map[string]interface{}))
-		log.Print(hitContent[0].(map[string]interface{})["_source"])
-		log.Print(hitContent[0].(map[string]interface{})["_source"].(map[string]interface{})["Name"])
+		//log.Print(hitContent)
+		//log.Print(hitContent[0])
+		//log.Print(hitContent[0].(map[string]interface{}))
+		//log.Print(hitContent[0].(map[string]interface{})["_source"])
+		//log.Print(hitContent[0].(map[string]interface{})["_source"].(map[string]interface{})["Name"])
 
 		if len(hitContent) > 0 {
-
-			secondsEastOfUTC := int((8 * time.Hour).Seconds())
-			beijing := time.FixedZone("Beijing Time", secondsEastOfUTC)
-			layout := "2006-01-02T15:04:05.0000000+08:00"
+			layout := "2006-01-02T15:04:05.0000000Z"
 			var tracerObj = hitContent[0].(map[string]interface{})["_source"]
-			tracer.StartAt, _ = time.ParseInLocation(layout, tracerObj.(map[string]interface{})["StartAt"].(string), beijing)
-
 			tracer.ID = tracerObj.(map[string]interface{})["ID"].(string)
 			tracer.DocumentID = tracerObj.(map[string]interface{})["DocumentID"].(string)
 			tracer.Name = tracerObj.(map[string]interface{})["Name"].(string)
-			tracer.StartAt, _ = time.ParseInLocation(layout, tracerObj.(map[string]interface{})["StartAt"].(string), beijing)
+			tracer.StartAt, _ = time.Parse(layout, tracerObj.(map[string]interface{})["StartAt"].(string))
 			tracer.FinishAt, _ = time.Parse(layout, tracerObj.(map[string]interface{})["FinishAt"].(string))
 			//t.Log(tracerObj.(map[string]interface{})["StartAt"].(string))
 			//
@@ -124,9 +122,9 @@ func GetTracer(tracerid string) *Tracer {
 			//log.Print(t)
 		}
 
-		for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
-			log.Printf(" * ID=%s, %s", hit.(map[string]interface{})["_id"], hit.(map[string]interface{})["_source"])
-		}
+		//for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+		//	log.Printf(" * ID=%s, %s", hit.(map[string]interface{})["_id"], hit.(map[string]interface{})["_source"])
+		//}
 	}
 
 	return tracer

@@ -1,4 +1,4 @@
-package rycked
+package es
 
 import (
 	"bytes"
@@ -68,6 +68,38 @@ func QueryTracer(tracerid string) *esapi.Response {
 	res, err := es.Search(
 		es.Search.WithContext(context.Background()),
 		es.Search.WithIndex(TracerIndexName),
+		es.Search.WithBody(&buf),
+		es.Search.WithTrackTotalHits(true),
+		es.Search.WithPretty(),
+	)
+
+	if err != nil {
+		log.Fatalf("Error query es: %s", err)
+	}
+	//defer res.Body.Close()
+
+	return res
+}
+
+// QueryTracer 1
+func QuerySpan(spanid string) *esapi.Response {
+	es := getClient()
+
+	var buf bytes.Buffer
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"match": map[string]interface{}{
+				"ID": spanid,
+			},
+		},
+	}
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		log.Fatalf("Error encoding query: %s", err)
+	}
+
+	res, err := es.Search(
+		es.Search.WithContext(context.Background()),
+		es.Search.WithIndex(SpanIndexName),
 		es.Search.WithBody(&buf),
 		es.Search.WithTrackTotalHits(true),
 		es.Search.WithPretty(),
