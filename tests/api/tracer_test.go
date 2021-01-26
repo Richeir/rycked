@@ -1,11 +1,12 @@
 package api
 
 import (
-	"github.com/Richeir/rycked"
 	"testing"
+
+	"github.com/Richeir/rycked"
 )
 
 func TestTracer(t *testing.T) {
-	var tracer apm.Tracer
+	var tracer rycked.Tracer
 	tracer.StartSpan("testTracer1", "")
 }
