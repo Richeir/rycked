@@ -8,7 +8,13 @@ import (
 )
 
 // SpanContext 1
-type SpanContext interface {
+type SpanContext struct {
+}
+
+// ForeachBaggageItem 1
+// TODO: 实现ForeachBaggageItem
+func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool){
+
 }
 
 // Span 一个有开始和结束的最小调用的过程
@@ -25,7 +31,6 @@ type Span struct {
 // Finish : Span 的完成方法，标记好结束时间，更新至ES
 func (span *Span) Finish() {
 	span.FinishAt = time.Now().UTC()
-	//TODO: 更新至ES
 	b, _ := json.Marshal(span)
 	es.WriteEs(es.SpanIndexName, string(b), span.DocumentID)
 }

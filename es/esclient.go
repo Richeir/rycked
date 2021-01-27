@@ -17,8 +17,8 @@ const TracerIndexName = "rycked.tracer"
 // SpanIndexName 1
 const SpanIndexName = "rycked.span"
 
-// EsBridge 1
-type EsBridge struct {
+// EsClient 1
+type EsClient struct {
 }
 
 // getClient 1
@@ -50,14 +50,14 @@ func WriteEs(indexName, jsonString, docID string) {
 }
 
 // QueryTracer 1
-func QueryTracer(tracerid string) *esapi.Response {
+func QueryTracer(tracerId string) *esapi.Response {
 	es := getClient()
 
 	var buf bytes.Buffer
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
 			"match": map[string]interface{}{
-				"ID": tracerid,
+				"ID": tracerId,
 			},
 		},
 	}
@@ -82,14 +82,14 @@ func QueryTracer(tracerid string) *esapi.Response {
 }
 
 // QueryTracer 1
-func QuerySpan(spanid string) *esapi.Response {
+func QuerySpan(spanId string) *esapi.Response {
 	es := getClient()
 
 	var buf bytes.Buffer
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
 			"match": map[string]interface{}{
-				"ID": spanid,
+				"ID": spanId,
 			},
 		},
 	}

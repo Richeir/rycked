@@ -55,7 +55,6 @@ func NewSpan(tracer *Tracer, operationName string) *Span {
 		DocumentID:    uuid.String(),
 	}
 
-	//TODO:写入ES
 	b, _ := json.Marshal(span)
 	es.WriteEs(es.SpanIndexName, string(b), uuid.String())
 

@@ -1,3 +1,4 @@
 # rycked
 
-An APM project
+rycked is an APM project
+
