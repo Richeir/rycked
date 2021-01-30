@@ -3,17 +3,21 @@ package rycked
 import (
 	"encoding/json"
 	"github.com/Richeir/rycked/es"
+	"github.com/opentracing/opentracing-go"
 	"log"
 	"time"
 )
 
 // SpanContext 1
 type SpanContext struct {
+	TraceID string
+	SpanId  string
+	Baggage map[string]string
 }
 
 // ForeachBaggageItem 1
 // TODO: 实现ForeachBaggageItem
-func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool){
+func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {
 
 }
 
@@ -26,6 +30,24 @@ type Span struct {
 	Depth         int
 	StartAt       time.Time
 	FinishAt      time.Time
+	Tags          []opentracing.Tag
+	Logs          []opentracing.LogData
+}
+
+func (span *Span) SpanContext() *SpanContext {
+	sc := &SpanContext{}
+	sc.TraceID = span.TraceID
+	sc.SpanId = span.ID
+
+	return sc
+}
+
+func (span *Span) SetTag(key string, value interface{}) Span {
+	var tag opentracing.Tag
+	tag.Key = key
+	tag.Value = value
+	span.Tags = append(span.Tags,tag)
+	return *span
 }
 
 // Finish : Span 的完成方法，标记好结束时间，更新至ES
